@@ -1,0 +1,16 @@
+{
+  "name": "landmark",
+  "version": "0.0.0",
+  "description": "LAN file sharing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodejs",
+    "LAN",
+    "file-sharing"
+  ],
+  "author": "Tongyu Lu",
+  "license": "MIT"
+}
