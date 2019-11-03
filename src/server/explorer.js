@@ -5,6 +5,7 @@ const Events = require("events");
 const Consts = require('./constants');
 
 const FILEBANK_PATH = Path.join(Consts.ROOT, "filebank");
+const DOWNLOAD_PATH = Path.join(FILEBANK_PATH, "download");
 
 var fullPath = (relPath) => Path.join(FILEBANK_PATH, relPath);
 
@@ -85,9 +86,9 @@ var walk = function (dir, superUpdater, callback) {
     walk("/", retUpdater, callback);
 })();
 
-let router = Express.Router();
+let routerDownload = Express.Router();
 
-router.get("/*", function (req, res) {
+routerDownload.get("/*", function (req, res) {
     var ret = { res: undefined };
     var callback = (res) => {
         ret.res = res;
@@ -97,9 +98,9 @@ router.get("/*", function (req, res) {
         console.dir(ret.res, { depth: 0 }); // Don't give depth here
         res.send(JSON.stringify(ret.res));
     });
-    walk(req.path, retUpdater, callback);
+    walk(Path.join("download", req.path), retUpdater, callback);
 });
 
 module.exports = {
-    router: router
+    download: routerDownload
 };

@@ -43,5 +43,9 @@ module.exports = {
             filename: 'index.html',
             template: 'src/client/html/index.html',
         }),
+        new HtmlWebpackPlugin({
+            filename: 'upload/index.html',
+            template: 'src/client/html/upload/index.html',
+        }),
     ],
 };
