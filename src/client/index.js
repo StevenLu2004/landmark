@@ -21,10 +21,22 @@ let explorer = new Vue({
     el: "#explorer",
     data: explorerData,
     mounted: function() {
-        for (var i = 0; i < 3; i++) {
-            this.directory.folders.push(new Components.Folder(`Folder ${i + 1}`));
-        }
+        this.update();
     },
+    methods: {
+        update: function() {
+            var app = this;
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var res = this.responseText;
+                    app.directory = JSON.parse(res);
+                }
+            };
+            xhttp.open("GET", "explorer", true);
+            xhttp.send();
+        },
+    }
 });
 
 // AJAX test
