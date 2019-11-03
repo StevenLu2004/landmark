@@ -7,6 +7,13 @@ const Consts = require('./constants');
 const FILEBANK_PATH = Path.join(Consts.ROOT, "filebank");
 const DOWNLOAD_PATH = Path.join(FILEBANK_PATH, "download");
 
+// Test download path availability
+(() => {
+    FS.stat(DOWNLOAD_PATH, (err, stat) => {
+        if (!stat) FS.mkdirSync(DOWNLOAD_PATH);
+    });
+})(); // Self-call
+
 var fullPath = (relPath) => Path.join(FILEBANK_PATH, relPath);
 
 class WalkReady extends Events { };
@@ -81,9 +88,10 @@ var walk = function (dir, superUpdater, callback) {
     };
     var retUpdater = new WalkReady();
     retUpdater.on("ready", () => {
-        console.dir(ret.res, { depth: null }); // Indefinite depth for debug
+        console.dir(ret.res); // Indefinite depth for debug; not debugging this.
     });
-    walk("/", retUpdater, callback);
+    walk("/download", retUpdater, callback);
+    walk("/upload", retUpdater, callback);
 })();
 
 let routerDownload = Express.Router();

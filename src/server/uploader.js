@@ -68,7 +68,8 @@ let routerUpload = Express.Router();
 
 routerUpload.post(/^\/(index.html)?$/, uploadSingleFile, (req, res, next) => {
     console.dir(req.file);
-    res.sendFile(Path.join(Consts.ROOT, "dist/upload/index.html"));
+    // res.sendFile(Path.join(Consts.ROOT, "dist/upload/index.html"));
+    res.redirect("/upload");
 });
 
 routerUpload.use(Express.static("dist/upload"));

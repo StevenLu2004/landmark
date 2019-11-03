@@ -47,5 +47,9 @@ module.exports = {
             filename: 'upload/index.html',
             template: 'src/client/html/upload/index.html',
         }),
+        new HtmlWebpackPlugin({
+            filename: 'peripheral/index.html',
+            template: 'src/client/html/peripheral/index.html',
+        }),
     ],
 };

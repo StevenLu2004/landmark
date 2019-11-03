@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>peripheral|LANdmark</title>
+    </head>
+    <body>
+        <h1>LANdmark<sup>peripheral</sup></h1>
+        <pre><a href="/">&lt;== Explorer</a></pre>
+        <form action="/peripheral/index.html" method="post" enctype="multipart/form-data">
+            <div>Peripheral Upload</div>
+            <input type="file" name="file"><br />
+            <span>Expires in (seconds): </span><input type="number" name="expire" min="60" max="600" value="60"><br />
+            <span>#Downloads allowed: </span><input type="number" name="downloadCount" min="1" max="100" value="10"><br />
+            <input type="submit" value="Upload">
+        </form>
+        <br />
+        <div id="p-explorer">
+            <div>Peripheral Explorer</div>
+            <ul>
+                <li v-for="file in files" v-bind:title="JSON.stringify(file.info, null, 2)">
+                    <a v-bind:href="'/p-download/' + file.name" target="_blank">{{ file.name }}</a>
+                    <a v-bind:href="'/p-download/' + file.name" download>[&darr;]</a>
+                </li>
+            </ul>
+        </div>
+    </body>
+</html>
