@@ -1,0 +1,28 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  max-width: 8in;
+  padding: 0.25in;
+  margin: auto;
+  margin-top: 0.25in;
+  margin-bottom: 0.25in;
+  background-color: #fff;
+  border: 1pt solid;
+  font-family: Arial, sans-serif;
+}
+body h1 {
+  text-align: center;
+  margin: 0.1in;
+  font-family: 'Times New Roman', Times, serif;
+}
+body h1 sup {
+  color: #42b883;
+}
+body a {
+  text-decoration: none;
+  color: #42b883;
+}
+body li {
+  list-style-type: none;
+}

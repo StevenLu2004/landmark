@@ -1,6 +1,7 @@
 import Vue from 'vue/dist/vue.esm.js';
 import io from 'socket.io-client/dist/socket.io.js';
 import Components from './components.js';
+import './css/index.css';
 
 // Register components
 Vue.component("directory", Components.Directory.template);
