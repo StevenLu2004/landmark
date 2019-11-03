@@ -84,7 +84,7 @@ router.get("/*", function (req, res) {
     };
     var retUpdater = new WalkReady();
     retUpdater.on("ready", () => {
-        console.log(ret.res); // Don't give depth here
+        console.dir(ret.res, {depth: 0}); // Don't give depth here
         res.send(JSON.stringify(ret.res));
     });
     walk(FILEBANK_PATH, retUpdater, callback);
