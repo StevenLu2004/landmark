@@ -2,8 +2,11 @@ const Express = require("express");
 const Path = require("path");
 const FS = require("fs");
 const Events = require("events");
+const Consts = require('./constants');
 
-const FILEBANK_PATH = Path.join(__dirname, "../../filebank");
+const FILEBANK_PATH = Path.join(Consts.ROOT, "filebank");
+
+var fullPath = (relPath) => Path.join(FILEBANK_PATH, relPath);
 
 class WalkReady extends Events { };
 
@@ -24,8 +27,10 @@ var walk = function (dir, superUpdater, callback) {
         if (!ready) superUpdater.emit("ready");
     });
     // Scan dir
-    FS.readdir(dir, function (err, files) {
+    var fdir = fullPath(dir);
+    FS.readdir(fdir, function (err, files) {
         if (err) {
+            console.log(`readdir error: ${err}`);
             // If there's an error, silence and make ret ready immediately
             retUpdater.emit("setReady", 0);
             return;
@@ -34,7 +39,13 @@ var walk = function (dir, superUpdater, callback) {
         retUpdater.emit("setReady", files.length);
         // Go over every file
         files.forEach((file) => {
-            var filep = Path.resolve(dir, file);
+            if (file.match(/^\..*/)) {
+                // The file is a hidden file, with prefix '.'
+                // Directly skip the file by emitting "ready" and returning
+                retUpdater.emit("ready");
+                return;
+            }
+            var filep = Path.resolve(fdir, file);
             FS.stat(filep, function (err, stat) {
                 if (stat) {
                     if (stat.isDirectory()) {
@@ -48,11 +59,13 @@ var walk = function (dir, superUpdater, callback) {
                         // Recurse deeper. Folders are not immediately ready, but walk will call retUpdater.emit
                         walk(Path.join(dir, file), retUpdater, save);
                     } else {
-                        var tmp = { name: file };
+                        var tmp = { name: file, path: Path.join(dir, file) };
                         ret.files.push(tmp);
                         // Single file is ready
                         retUpdater.emit("ready");
                     }
+                } else {
+                    console.log(`readdir error: ${err}`);
                 }
             });
         });
@@ -67,27 +80,24 @@ var walk = function (dir, superUpdater, callback) {
     };
     var retUpdater = new WalkReady();
     retUpdater.on("ready", () => {
-        console.dir(ret.res, {depth: null}); // Indefinite depth for debug
+        console.dir(ret.res, { depth: null }); // Indefinite depth for debug
     });
-    walk(FILEBANK_PATH, retUpdater, callback);
+    walk("/", retUpdater, callback);
 })();
 
 let router = Express.Router();
 
 router.get("/*", function (req, res) {
-    // req.originalUrl contains the full path
-    var fullPath = Path.join(FILEBANK_PATH, req.path);
-    console.log(fullPath);
     var ret = { res: undefined };
     var callback = (res) => {
         ret.res = res;
     };
     var retUpdater = new WalkReady();
     retUpdater.on("ready", () => {
-        console.dir(ret.res, {depth: 0}); // Don't give depth here
+        console.dir(ret.res, { depth: 0 }); // Don't give depth here
         res.send(JSON.stringify(ret.res));
     });
-    walk(FILEBANK_PATH, retUpdater, callback);
+    walk(req.path, retUpdater, callback);
 });
 
 module.exports = {

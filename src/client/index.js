@@ -9,7 +9,7 @@ Vue.component("file", Components.File.template);
 // Initialize external reference to explorer data
 let explorerData = {
     title: "Explorer",
-    debug: true,
+    debug: false,
     directory: new Components.Directory(),
 };
 
@@ -20,11 +20,11 @@ console.log(JSON.stringify(explorerData));
 let explorer = new Vue({
     el: "#explorer",
     data: explorerData,
-    mounted: function() {
+    mounted: function () {
         this.update();
     },
     methods: {
-        update: function() {
+        update: function () {
             var app = this;
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
@@ -40,9 +40,9 @@ let explorer = new Vue({
 });
 
 // AJAX test
-window.onload = function() {
+window.onload = function () {
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
+    xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var res = this.responseText;
             console.log(res);

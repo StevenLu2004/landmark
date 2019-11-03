@@ -7,11 +7,13 @@ var Directory = function () {
 var Folder = function (name) {
     this.name = name;
     this.contents = new Directory();
+    this.path = "/";
     return this;
 };
 
 var File = function (name) {
     this.name = name;
+    this.path = "/";
     return this;
 };
 
@@ -34,7 +36,7 @@ Folder.template = {
     props: ["folder"],
     template: `
     <li>
-        <p>{{ folder.name }} <button v-on:click='toggleExpand'>{{ expanded ? 'collapse' : 'expand' }}</button></p>
+        <p><button v-on:click='toggleExpand'>{{ expanded ? 'v' : '>' }}</button> {{ folder.name }}</p>
         <directory v-if='expanded' v-bind:directory='folder.contents' />
     </li>`,
     data: function () {
@@ -54,11 +56,14 @@ File.template = {
     props: ["file"],
     template: `
     <li>
-        <p>{{ file.name }}</p>
+        <p>
+            <a v-bind:href='"/download" + file.path' target='_blank'>{{ file.name }}</a>
+            <a v-bind:href='"/download" + file.path' download>[&darr;]</a>
+        </p>
     </li>`,
     data: function () {
         return {
-            file: new File("");
+            file: new File(""),
         };
     },
 };
