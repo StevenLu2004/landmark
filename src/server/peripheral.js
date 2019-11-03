@@ -172,28 +172,32 @@ routerDownload.get(/.*/, (req, res) => {
             res.status(404).send("404 File not found. The file might have expired, or its downloads might have been used up.");
             return;
         }
-        res.sendFile(path);
-        // return; // Skip the rest; delete this later
-        try {
-            var fileInfo = JSON.parse(FS.readFileSync(infoPath, { encoding: "utf8" }));
-            fileInfo.constraints.downloadCount--;
-            FS.writeFileSync(infoPath, JSON.stringify(fileInfo));
-            // TODO: clear files after downloads are used out
-            if (!fileInfo.constraints.downloadCount) {
-                try {
-                    clearTimeout(timeouts[req.file.filename]);
-                    FS.unlinkSync(Path.join(PERIPHERAL_PATH, req.file.filename));
-                    FS.unlinkSync(Path.join(PERIPHERAL_PATH, `.$${req.file.filename}.landmark.json`));
-                    timeouts[req.file.filename] = undefined;
-                } catch (err) {
-                    console.log(`Error in timeout unlink: ${err}`);
-                }
-                io.emit("update");
+        res.sendFile(path, null, (err) => {
+            if (err) {
+                console.log(`Error in sendFile: ${err}`);
+                return;
             }
-        } catch (err) {
-            console.log(`Error updating file info: ${err}`);
-            return;
-        }
+            try {
+                var fileInfo = JSON.parse(FS.readFileSync(infoPath, { encoding: "utf8" }));
+                fileInfo.constraints.downloadCount--;
+                FS.writeFileSync(infoPath, JSON.stringify(fileInfo));
+                // TODO: clear files after downloads are used out
+                if (!fileInfo.constraints.downloadCount) {
+                    try {
+                        clearTimeout(timeouts[rpath]);
+                        FS.unlinkSync(Path.join(PERIPHERAL_PATH, rpath));
+                        FS.unlinkSync(Path.join(PERIPHERAL_PATH, `.$${rpath}.landmark.json`));
+                        timeouts[rpath] = undefined;
+                    } catch (err) {
+                        console.log(`Error in delete unlink: ${err}`);
+                    }
+                    io.emit("update");
+                }
+            } catch (err) {
+                console.log(`Error updating file info: ${err}`);
+                return;
+            }
+        });
     });
 });
 
