@@ -19,6 +19,8 @@ var getDate = () => {
     return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 };
 
+var getPath = (req, file) => Path.join(UPLOAD_PATH, `${req.ip.replace(/[:<>!@#$%^&*~,|\\]/g, "_")} – ${getDate()}`);
+
 let upload = Multer({
     fileFilter: function (req, file, cb) {
         console.dir(file);
@@ -31,25 +33,27 @@ let upload = Multer({
     },
     storage: Multer.diskStorage({
         destination: (req, file, cb) => {
-            var path = Path.join(UPLOAD_PATH, `${req.ip} – ${getDate()}`);
+            var path = getPath(req, file);
             FS.stat(path, (err, stat) => {
                 if (!stat) FS.mkdirSync(path);
-                cb(null, path);
+                return cb(null, path);
             });
         },
         filename: (req, file, cb) => {
-            var path = Path.join(UPLOAD_PATH, `${req.ip} – ${getDate()}`);
+            var path = getPath(req, file);
+            var m = file.originalname.match(/(.*)\.([A-Za-z0-9-_]*)/);
+            var name = m[1], ext = m[2];
             var nameTransform = (name, i) => {
-                FS.stat(Path.join(path, `${name}${(i) ? ` ${i}` : ""}`), (err, stat) => {
+                FS.stat(Path.join(path, `${name}${(i) ? ` ${i}` : ""}.${ext}`), (err, stat) => {
                     if (!stat) {
                         // File doesn't exist, OK with it
-                        cb(null, `${name}${(i) ? ` ${i}` : ""}`);
+                        return cb(null, `${name}${(i) ? ` ${i}` : ""}.${ext}`);
                     }
                     // Increment name and try again
-                    nameTransform(name, i + 1);
+                    return nameTransform(name, i + 1);
                 });
             };
-            nameTransform(file.originalname, 0);
+            return nameTransform(name, 0);
         }
     }),
 });
