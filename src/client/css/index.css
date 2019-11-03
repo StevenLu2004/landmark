@@ -8,7 +8,8 @@ body {
   margin-top: 0.25in;
   margin-bottom: 0.25in;
   background-color: #fff;
-  border: 1pt solid;
+  border-radius: 0.25in;
+  border: 1px solid #42b883;
   font-family: Arial, sans-serif;
 }
 body h1 {
@@ -19,10 +20,31 @@ body h1 {
 body h1 sup {
   color: #42b883;
 }
+body div > ul {
+  height: 4in;
+  overflow-y: auto;
+  border-top: 1px solid #42b883;
+  border-bottom: 1px solid #42b883;
+}
 body a {
   text-decoration: none;
   color: #42b883;
 }
 body li {
   list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+body li > p > button,
+body li > p > a:first-child {
+  display: inline-block;
+  appearance: none;
+  -ms-appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  font: inherit;
+  border: none;
+  width: 0.2in;
+  text-align: center;
 }

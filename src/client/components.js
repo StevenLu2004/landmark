@@ -57,8 +57,8 @@ File.template = {
     template: `
     <li>
         <p>
-            <a v-bind:href='"/download" + file.path' target='_blank'>{{ file.name }}</a>
-            <a v-bind:href='"/download" + file.path' download>[&darr;]</a>
+            <a v-bind:href='"/" + file.path' download>&darr;</a>
+            <a v-bind:href='"/" + file.path' target='_blank'>{{ file.name }}</a>
         </p>
     </li>`,
     data: function () {
