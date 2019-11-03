@@ -7,14 +7,7 @@ const Uploader = require('./uploader');
 const Peripheral = require('./peripheral');
 const Consts = require('./constants');
 
-const PORT = 3000;
-let pkgInfo;
-
-(() => {
-    var pkg = FS.readFileSync(Path.join(Consts.ROOT, "package.json"), { encoding: 'utf8' });
-    pkgInfo = JSON.parse(pkg);
-    console.log(`LANdmark ${pkgInfo.version}`);
-})();
+const PORT = Consts.SETTINGS["main-server-port"];
 
 let app = Express();
 

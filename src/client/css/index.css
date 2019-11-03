@@ -9,7 +9,7 @@ body {
   margin-bottom: 0.25in;
   background-color: #fff;
   border-radius: 0.25in;
-  border: 1px solid #42b883;
+  border: 1pt solid #42b883;
   font-family: Arial, sans-serif;
 }
 body h1 {
@@ -23,8 +23,8 @@ body h1 sup {
 body div > ul {
   height: 4in;
   overflow-y: auto;
-  border-top: 1px solid #42b883;
-  border-bottom: 1px solid #42b883;
+  border-top: 1pt solid #42b883;
+  border-bottom: 1pt solid #42b883;
 }
 body a {
   text-decoration: none;
@@ -32,7 +32,6 @@ body a {
 }
 body li {
   list-style-type: none;
-  margin: 0;
   padding: 0;
 }
 body li > p > button,
