@@ -1,4 +1,5 @@
 import Vue from 'vue/dist/vue.esm.js';
+import io from 'socket.io-client/dist/socket.io.js';
 import Components from './components.js';
 
 // Register components
@@ -16,9 +17,12 @@ let explorerData = {
 // Debug test
 console.log(JSON.stringify(explorerData));
 
+// Create global fields
+let explorer, pExplorer, socket;
+
 // Create explorer
 var createExplorer = () => {
-    let explorer = new Vue({
+    explorer = new Vue({
         el: "#explorer",
         data: explorerData,
         mounted: function () {
@@ -43,12 +47,18 @@ var createExplorer = () => {
 
 // Create p-explorer
 var createPExplorer = () => {
-    let pExplorer = new Vue({
+    pExplorer = new Vue({
         el: "#p-explorer",
         data: {
             files: [],
         },
         mounted: function () {
+            socket = io(`http://${location.hostname}:${3001}`);
+            var app = this;
+            socket.on("update", () => {
+                app.update();
+                // alert();
+            });
             this.update();
         },
         methods: {

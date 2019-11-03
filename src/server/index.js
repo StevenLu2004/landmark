@@ -1,5 +1,5 @@
-const FS = require('fs');
 const Express = require('express');
+const FS = require('fs');
 const Path = require('path');
 const Explorer = require('./explorer');
 const Downloader = require('./downloader');

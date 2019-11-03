@@ -44,6 +44,20 @@ const PERIPHERAL_PATH = Path.join(Consts.ROOT, "filebank/peripheral");
     _clear();
 })(); // Self-call
 
+// Give timeout dict
+
+timeouts = {};
+
+// Init socket.io
+
+http = Http.createServer();
+io = SocketIO(http);
+io.on('connection', (socket) => {
+    console.log(`connection from ${socket}`);
+    socket.emit("refresh");
+});
+http.listen(3001);
+
 // Create express router
 let router = Express.Router();
 
@@ -126,33 +140,26 @@ router.post(/^\/(index.html)?$/, uploadSingleFile, (req, res, next) => {
         if (err) console.log(`Error writing file: ${err}`);
     });
     // TODO: add persistence and download constraints
-    // TODO: socket.io notify everyone the change, request for refresh
-    // Send peripheral page
-    // res.sendFile(Path.join(Consts.ROOT, "dist/peripheral", "index.html"));
+    timeouts[req.file.filename] = setTimeout(() => {
+        try {
+            FS.unlinkSync(Path.join(PERIPHERAL_PATH, req.file.filename));
+            FS.unlinkSync(Path.join(PERIPHERAL_PATH, `.$${req.file.filename}.landmark.json`));
+            timeouts[req.file.filename] = undefined;
+        } catch (err) {
+            console.log(`Error in timeout unlink: ${err}`);
+        }
+        io.emit("update");
+    }, fileData.constraints.expire * 1000);
+    // Redirect
     res.redirect("/peripheral");
+    // Socket.IO integration
+    io.emit("update");
 });
 
 // Download
 let routerDownload = Express.Router();
 
 routerDownload.get(/.*/, (req, res) => {
-    // var rpath = req.path.match(/^\/?(.*?)$/)[1].replace(/%[0-9a-fA-F][0-9a-fA-F]/g, (x) => {
-    //     var numbers = "0123456789";
-    //     var lowerLetters = "abcdef";
-    //     var upperLetters = "ABCDEF";
-    //     var d1 = numbers.indexOf(x[1]);
-    //     if (d1 === -1) {
-    //         d1 = lowerLetters.indexOf(x[1]) + 10;
-    //         if (d1 === 9) d1 = upperLetters.indexOf(x[1]) + 10;
-    //     }
-    //     var d2 = numbers.indexOf(x[2]);
-    //     if (d2 === -1) {
-    //         d2 = lowerLetters.indexOf(x[2]) + 10;
-    //         if (d2 === 9) d2 = upperLetters.indexOf(x[2]) + 10;
-    //     }
-    //     return String.fromCharCode(d1 << 4 | d2);
-    // });
-    // var rpath = Url.parse(`http://example.org${req.path}`).pathname;
     var rpath = decodeURIComponent(req.path.match(/^\/?(.*?)$/)[1]);
     console.log(rpath);
     var path = Path.join(PERIPHERAL_PATH, rpath);
@@ -166,12 +173,23 @@ routerDownload.get(/.*/, (req, res) => {
             return;
         }
         res.sendFile(path);
-        return; // Skip the rest; delete this later
+        // return; // Skip the rest; delete this later
         try {
             var fileInfo = JSON.parse(FS.readFileSync(infoPath, { encoding: "utf8" }));
             fileInfo.constraints.downloadCount--;
             FS.writeFileSync(infoPath, JSON.stringify(fileInfo));
             // TODO: clear files after downloads are used out
+            if (!fileInfo.constraints.downloadCount) {
+                try {
+                    clearTimeout(timeouts[req.file.filename]);
+                    FS.unlinkSync(Path.join(PERIPHERAL_PATH, req.file.filename));
+                    FS.unlinkSync(Path.join(PERIPHERAL_PATH, `.$${req.file.filename}.landmark.json`));
+                    timeouts[req.file.filename] = undefined;
+                } catch (err) {
+                    console.log(`Error in timeout unlink: ${err}`);
+                }
+                io.emit("update");
+            }
         } catch (err) {
             console.log(`Error updating file info: ${err}`);
             return;
